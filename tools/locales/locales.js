@@ -69,23 +69,24 @@ class NxLocales extends LitElement {
     const newPath = this.path.replace(found.location, lang.location);
     const newSite = lang.site || `/${this.site}`;
     const newFullPath = `/${this.org}${newSite}${newPath}`;
-    const newAEMFullPath = `/${this.org}${newSite}/main${newPath}.html`;
+    const newAEMFullPath = `/${this.org}${newSite}/main${newPath}`;
     return { currentPath: copyFromPath, newFullPath, newPath, newAEMFullPath };
   }
 
   async handlePublishAll(items) {
     this._message = { text: 'Publishing banner' };
-    const found = this.findCurrentLang();
     const publishLangs = items[0].langs ? this.flattenLocaleLangs(items) : items;
     const pageList = publishLangs.map((lang) => ({ path: this.getPage(lang).newAEMFullPath }));
-    await publishPages(pageList);
+    const published = await publishPages(pageList);
+    console.log(published);
     this._message = undefined;
   }
 
   async handlePublish(item) {
     this._message = { text: 'Publishing banner' };
     const pageList = [{ path: item.newAEMFullPath }];
-    await publishPages(pageList);
+    const published = await publishPages(pageList);
+    console.log(published);
     this._message = undefined;
   }
 
@@ -100,8 +101,8 @@ class NxLocales extends LitElement {
           return html`
           <li>
             <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
-            <button @click=${() => this.handlePublish(page)}>Publish</button>
-            ${!isCurrent ? html`<button @click=${() => this.handleOpen(page)}>Edit</button>` : ''}
+            <button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>
+            ${!isCurrent ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>` : ''}
           </li>`;
         })}
       </ul>
@@ -113,7 +114,7 @@ class NxLocales extends LitElement {
     const isCurrent = page.newPath === this.path && this.site === lang.site.substring(1);
     return html`
     <p class="${isCurrent ? 'current' : ''}">${name}</p>
-    ${!isCurrent ? html`<div class="lang-button"><button @click=${() => this.handleOpen(page)}>Edit</button></div>` : ''}`;
+    ${!isCurrent ? html`<div class="lang-button"><button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button></div>` : ''}`;
   }
 
   renderGroup(title, items) {

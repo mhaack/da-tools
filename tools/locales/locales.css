@@ -10,6 +10,10 @@ button {
   background-color: var(--s2-blue-400);
 }
 
+.publish-button {
+  background-color: var(--s2-green-400);
+}
+
 p.current {
   color: red
 }
