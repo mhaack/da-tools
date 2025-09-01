@@ -7,7 +7,15 @@ button {
   border: none;
   border-radius: 6px;
   padding: 2px 8px;
+  background-color: var(--s2-green-600);
+}
+
+.publish-button {
   background-color: var(--s2-blue-400);
+}
+
+p.current {
+  color: var(--s2-red-800);
 }
 
 .message {

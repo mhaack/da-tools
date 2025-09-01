@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import { Queue } from 'https://da.live/nx/public/utils/tree.js';
 
 const AEM_ORIGIN = 'https://admin.hlx.page';
@@ -9,8 +10,12 @@ export const [setContext, getContext] = (() => {
   return [
     (supplied) => {
       ctx = (() => {
-        const { org, repo: site, path, token } = supplied;
-        return { org, site, path, token };
+        const {
+          org, repo: site, path, token,
+        } = supplied;
+        return {
+          org, site, path, token,
+        };
       })();
       return ctx;
     },
@@ -21,19 +26,24 @@ export const [setContext, getContext] = (() => {
 export async function getLangsAndLocales() {
   const { org, site, token } = getContext();
   const opts = { headers: { Authorization: `Bearer ${token}` } };
-  const resp = await fetch(`${DA_ORIGIN}/source/${org}/${site}${LANG_CONF}`, opts);
+
+  const params = new URLSearchParams(window.location.search);
+  const globalConfig = params.get('global');
+  const configSource = globalConfig || `/${org}/${site}`;
+  const resp = await fetch(`${DA_ORIGIN}/source${configSource}${LANG_CONF}`, opts);
   if (!resp.ok) return { message: { text: 'There was an error fetching languages.', type: 'error' } };
   const sheet = await resp.json();
   const { data: langData } = sheet.languages;
   const { data: localeData } = sheet.locales;
 
-  const langs = langData.map((row) => ({ name: row.name, location: row.location }));
+  const langs = langData.map((row) => ({ name: row.name, location: row.location, site: row.site }));
 
   const locales = localeData.map((row) => {
     const localeLangs = langs.map((lang) => ({
       name: lang.name,
+      site: row.site,
       globalLocation: lang.location,
-      location: `${lang.location}-${row.location.replace('/', '')}`,
+      location: row.location ? `${lang.location}-${row.location.replace('/', '')}` : lang.location,
     }));
     return {
       ...row,
@@ -60,13 +70,13 @@ export async function copyPage(sourcePath, destPath) {
 }
 
 export async function publishPages(pages) {
-  const { org, site, token } = getContext();
+  const { token } = getContext();
   const opts = { method: 'POST', headers: { Authorization: `Bearer ${token}` } };
 
   const publish = async (url) => {
-    let resp = await fetch(`${AEM_ORIGIN}/preview/${org}/${site}/main${url.path}`, opts);
+    let resp = await fetch(`${AEM_ORIGIN}/preview${url.path}`, opts);
     if (resp.status === 200) {
-      resp = await fetch(`${AEM_ORIGIN}/live/${org}/${site}/main${url.path}`, opts);
+      resp = await fetch(`${AEM_ORIGIN}/live${url.path}`, opts);
     }
     url.status = resp.status;
   };
@@ -80,7 +90,6 @@ export async function publishPages(pages) {
         nextUrl.inProgress = true;
         queue.push(nextUrl);
       } else {
-        console.log('out');
         console.log(pages);
         const finished = pages.every((url) => url.status);
         if (finished) {
