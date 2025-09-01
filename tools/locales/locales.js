@@ -64,7 +64,7 @@ class NxLocales extends LitElement {
     const newFullPath = `/${this.org}/${newSite}${newPath}`;
     const exists = await getPage(newFullPath);
     if (!exists) await copyPage(`/${this.org}/${this.site}${copyFromPath}`, newFullPath);
-    this.actions.setHash(newFullPath);
+    this.actions.setHref(`https://da.live/edit#${newFullPath}`);
   }
 
   async handlePublish(items) {

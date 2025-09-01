@@ -21,7 +21,11 @@ export const [setContext, getContext] = (() => {
 export async function getLangsAndLocales() {
   const { org, site, token } = getContext();
   const opts = { headers: { Authorization: `Bearer ${token}` } };
-  const resp = await fetch(`${DA_ORIGIN}/source/${org}/${site}${LANG_CONF}`, opts);
+
+  const params = new URLSearchParams(window.location.search); 
+  const globalConfig = params.get('global');
+  const configSource = globalConfig ? globalConfig : `${org}/${site}`;
+  const resp = await fetch(`${DA_ORIGIN}/source/${configSource}${LANG_CONF}`, opts);
   if (!resp.ok) return { message: { text: 'There was an error fetching languages.', type: 'error' } };
   const sheet = await resp.json();
   const { data: langData } = sheet.languages;
