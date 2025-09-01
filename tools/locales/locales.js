@@ -7,7 +7,7 @@ import { setContext, getLangsAndLocales, getPage, copyPage, publishPages } from 
 const nx = `${new URL(import.meta.url).origin}/nx`;
 
 // Styles
-const sl = await getStyle('styles.css');
+const sl = await getStyle('https://da.live/nx/public/sl/styles.css');
 const styles = await getStyle(import.meta.url);
 
 class NxLocales extends LitElement {
