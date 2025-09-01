@@ -15,7 +15,7 @@ button {
 }
 
 p.current {
-  color: var(--s2-red);
+  color: var(--s2-red-800);
 }
 
 .message {
