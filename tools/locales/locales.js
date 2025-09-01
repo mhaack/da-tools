@@ -97,7 +97,7 @@ class NxLocales extends LitElement {
           const page = this.getPage(lang);
           return html`
           <li>
-            <p class="${page.newPath === this.path && this.site === lang.site.substring(1) ? 'current' : ''}>${lang.name}</p>
+            <p class="${page.newPath === this.path && this.site === lang.site.substring(1) ? 'current' : ''}">${lang.name}</p>
             <button @click=${() => this.handleOpen(page)}>Edit</button>
           </li>`;
         })}
