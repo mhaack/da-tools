@@ -1,10 +1,15 @@
-import { html, LitElement, nothing } from 'da-lit';
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable import/no-unresolved */
+import { html, LitElement } from 'da-lit';
 import DA_SDK from 'https://da.live/nx/utils/sdk.js';
 import getStyle from 'https://da.live/nx/public/utils/styles.js';
-import { setContext, getLangsAndLocales, getPage, copyPage, publishPages } from './index.js';
-
-// NX Base
-const nx = `${new URL(import.meta.url).origin}/nx`;
+import {
+  setContext,
+  getLangsAndLocales,
+  getPage,
+  copyPage,
+  publishPages,
+} from './index.js';
 
 // Styles
 const sl = await getStyle('https://da.live/nx/public/sl/styles.css');
@@ -53,7 +58,6 @@ class NxLocales extends LitElement {
     return found;
   }
 
-
   async handleOpen(page) {
     const exists = await getPage(page.newFullPath);
     if (!exists) await copyPage(page.currentPath, page.newFullPath);
@@ -70,7 +74,13 @@ class NxLocales extends LitElement {
     const newSite = lang.site || `/${this.site}`;
     const newFullPath = `/${this.org}${newSite}${newPath}`;
     const newAEMFullPath = `/${this.org}${newSite}/main${newPath}`;
-    return { currentPath: copyFromPath, newFullPath, newPath, newAEMFullPath };
+    // eslint-disable-next-line consistent-return
+    return {
+      currentPath: copyFromPath,
+      newFullPath,
+      newPath,
+      newAEMFullPath,
+    };
   }
 
   async handlePublishAll(items) {
@@ -90,15 +100,15 @@ class NxLocales extends LitElement {
     this._message = undefined;
   }
 
-  renderLocaleLangs(name,langs) {
+  renderLocaleLangs(name, langs) {
     return html`
     <p>${name}</p>
     <div class="locale-lang-list-container">
       <ul class="locale-lang-group-list">
         ${langs.map((lang) => {
-          const page = this.getPage(lang);
-          const isCurrent = page.newPath === this.path && this.site === lang.site.substring(1);
-          return html`
+    const page = this.getPage(lang);
+    const isCurrent = page.newPath === this.path && this.site === lang.site.substring(1);
+    return html`
           <li>
             <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
             <div class="locale-lang-buttons">
@@ -106,12 +116,12 @@ class NxLocales extends LitElement {
               <button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>
             </div>
           </li>`;
-        })}
+  })}
       </ul>
     </div>`;
   }
 
-  renderGroupLang(name,lang) {
+  renderGroupLang(name, lang) {
     const page = this.getPage(lang);
     const isCurrent = page.newPath === this.path && this.site === lang.site.substring(1);
     return html`
@@ -128,7 +138,7 @@ class NxLocales extends LitElement {
         </div>
         <ul class="lang-group-list">${items.map((item) => html`
           <li class="lang-top-list-item">
-            ${item.langs ? this.renderLocaleLangs(item.name,item.langs) : this.renderGroupLang(item.name,item)}
+            ${item.langs ? this.renderLocaleLangs(item.name, item.langs) : this.renderGroupLang(item.name, item)}
           </li>`)}
         </ul>
       </div>

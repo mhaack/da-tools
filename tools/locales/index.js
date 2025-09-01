@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import { Queue } from 'https://da.live/nx/public/utils/tree.js';
 
 const AEM_ORIGIN = 'https://admin.hlx.page';
@@ -9,8 +10,12 @@ export const [setContext, getContext] = (() => {
   return [
     (supplied) => {
       ctx = (() => {
-        const { org, repo: site, path, token } = supplied;
-        return { org, site, path, token };
+        const {
+          org, repo: site, path, token,
+        } = supplied;
+        return {
+          org, site, path, token,
+        };
       })();
       return ctx;
     },
@@ -22,9 +27,9 @@ export async function getLangsAndLocales() {
   const { org, site, token } = getContext();
   const opts = { headers: { Authorization: `Bearer ${token}` } };
 
-  const params = new URLSearchParams(window.location.search); 
+  const params = new URLSearchParams(window.location.search);
   const globalConfig = params.get('global');
-  const configSource = globalConfig ? globalConfig : `/${org}/${site}`;
+  const configSource = globalConfig || `/${org}/${site}`;
   const resp = await fetch(`${DA_ORIGIN}/source${configSource}${LANG_CONF}`, opts);
   if (!resp.ok) return { message: { text: 'There was an error fetching languages.', type: 'error' } };
   const sheet = await resp.json();
@@ -65,7 +70,7 @@ export async function copyPage(sourcePath, destPath) {
 }
 
 export async function publishPages(pages) {
-  const { org, site, token } = getContext();
+  const { token } = getContext();
   const opts = { method: 'POST', headers: { Authorization: `Bearer ${token}` } };
 
   const publish = async (url) => {
