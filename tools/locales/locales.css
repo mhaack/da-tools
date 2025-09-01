@@ -10,7 +10,7 @@ button {
   background-color: var(--s2-blue-400);
 }
 
-li.current {
+p.current {
   color: red
 }
 

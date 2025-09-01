@@ -60,7 +60,7 @@ class NxLocales extends LitElement {
     this.actions.setHref(`https://da.live/edit#${page.newFullPath}`);
   }
 
-  getUrl(lang) {
+  getPage(lang) {
     const found = this.findCurrentLang();
     if (!found) return;
 
@@ -71,7 +71,7 @@ class NxLocales extends LitElement {
     const newFullPath = `/${this.org}${newSite}${newPath}`;
 
 
-    return { currentPath: copyFromPath, newFullPath };  
+    return { currentPath: copyFromPath, newFullPath, newPath };
     // const exists = await getPage(newFullPath);
     // if (!exists) await copyPage(`/${this.org}/${this.site}${copyFromPath}`, newFullPath);
     // this.actions.setHref(`https://da.live/edit#${newFullPath}`);
@@ -88,20 +88,30 @@ class NxLocales extends LitElement {
     this._message = undefined;
   }
 
-  renderLocaleLangs(langs) {
-    return html`<div class="locale-lang-list-container">
+  renderLocaleLangs(name,langs) {
+    return html`
+    <p>${name}</p>
+    <div class="locale-lang-list-container">
       <ul class="locale-lang-group-list">
         ${langs.map((lang) => {
-          const url = this.getUrl(lang);
+          const page = this.getPage(lang);
           return html`
-          <li class="${url.currentPath == this.path ? 'current' : ''}">
-            <p>${lang.name}</p>
-            <button @click=${() => this.handleOpen(url)}>Edit</button>
+          <li">
+            <p class="${page.newPath === this.path && this.site === lang.site.substring(1) ? 'current' : ''}>${lang.name}</p>
+            <button @click=${() => this.handleOpen(page)}>Edit</button>
           </li>`;
         })}
       </ul>
     </div>`;
   }
+
+  renderGroupLang(name,lang) {
+    const page = this.getPage(lang);
+    return html`
+    <p class="${page.newPath === this.path && this.site === lang.site.substring(1) ? 'current' : ''}">${name}</p>
+    <div class="lang-button"><button @click=${() => this.handleOpen(page)}>Edit</button></div>`;
+  }
+
 
   renderGroup(title, items) {
     return html`
@@ -112,8 +122,7 @@ class NxLocales extends LitElement {
         </div>
         <ul class="lang-group-list">${items.map((item) => html`
           <li class="lang-top-list-item">
-            <p>${item.name}</p>
-            ${item.langs ? this.renderLocaleLangs(item.langs) : html`<div class="lang-button"><button @click=${() => this.handleOpen(item)}>Edit</button></div>`}
+            ${item.langs ? this.renderLocaleLangs(item.name,item.langs) : this.renderGroupLang(item.name,item)}
           </li>`)}
         </ul>
       </div>
