@@ -102,8 +102,8 @@ class NxLocales extends LitElement {
           <li>
             <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
             <div class="locale-lang-buttons">
-              <button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>
               ${!isCurrent ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>` : ''}
+              <button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>
             </div>
           </li>`;
         })}
