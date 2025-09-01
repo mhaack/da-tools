@@ -69,9 +69,11 @@ export async function publishPages(pages) {
   const opts = { method: 'POST', headers: { Authorization: `Bearer ${token}` } };
 
   const publish = async (url) => {
-    let resp = await fetch(`${AEM_ORIGIN}/preview/${org}/${site}/main${url.path}`, opts);
+    //let resp = await fetch(`${AEM_ORIGIN}/preview/${org}/${site}/main${url.path}`, opts);
+    let resp = await fetch(`${AEM_ORIGIN}/preview${url.path}`, opts);
     if (resp.status === 200) {
-      resp = await fetch(`${AEM_ORIGIN}/live/${org}/${site}/main${url.path}`, opts);
+      //resp = await fetch(`${AEM_ORIGIN}/live/${org}/${site}/main${url.path}`, opts);
+      resp = await fetch(`${AEM_ORIGIN}/live${url.path}`, opts);
     }
     url.status = resp.status;
   };

@@ -69,21 +69,22 @@ class NxLocales extends LitElement {
     const newPath = this.path.replace(found.location, lang.location);
     const newSite = lang.site || `/${this.site}`;
     const newFullPath = `/${this.org}${newSite}${newPath}`;
-    return { currentPath: copyFromPath, newFullPath, newPath };
+    const newAEMFullPath = `/${this.org}${newSite}/main${newPath}.html`;
+    return { currentPath: copyFromPath, newFullPath, newPath, newAEMFullPath };
   }
 
   async handlePublishAll(items) {
     this._message = { text: 'Publishing banner' };
     const found = this.findCurrentLang();
     const publishLangs = items[0].langs ? this.flattenLocaleLangs(items) : items;
-    const pageList = publishLangs.map((lang) => ({ path: this.getPage(lang).newFullPath }));
+    const pageList = publishLangs.map((lang) => ({ path: this.getPage(lang).newAEMFullPath }));
     await publishPages(pageList);
     this._message = undefined;
   }
 
   async handlePublish(item) {
     this._message = { text: 'Publishing banner' };
-    const pageList = [{ path: item.newFullPath }];
+    const pageList = [{ path: item.newAEMFullPath }];
     await publishPages(pageList);
     this._message = undefined;
   }
