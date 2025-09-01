@@ -96,7 +96,7 @@ class NxLocales extends LitElement {
         ${langs.map((lang) => {
           const page = this.getPage(lang);
           return html`
-          <li">
+          <li>
             <p class="${page.newPath === this.path && this.site === lang.site.substring(1) ? 'current' : ''}>${lang.name}</p>
             <button @click=${() => this.handleOpen(page)}>Edit</button>
           </li>`;
@@ -111,7 +111,6 @@ class NxLocales extends LitElement {
     <p class="${page.newPath === this.path && this.site === lang.site.substring(1) ? 'current' : ''}">${name}</p>
     <div class="lang-button"><button @click=${() => this.handleOpen(page)}>Edit</button></div>`;
   }
-
 
   renderGroup(title, items) {
     return html`
