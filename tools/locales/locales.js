@@ -69,21 +69,21 @@ class NxLocales extends LitElement {
     const newPath = this.path.replace(found.location, lang.location);
     const newSite = lang.site || `/${this.site}`;
     const newFullPath = `/${this.org}${newSite}${newPath}`;
-
-
     return { currentPath: copyFromPath, newFullPath, newPath };
-    // const exists = await getPage(newFullPath);
-    // if (!exists) await copyPage(`/${this.org}/${this.site}${copyFromPath}`, newFullPath);
-    // this.actions.setHref(`https://da.live/edit#${newFullPath}`);
   }
 
-
-
-  async handlePublish(items) {
+  async handlePublishAll(items) {
     this._message = { text: 'Publishing banner' };
     const found = this.findCurrentLang();
     const publishLangs = items[0].langs ? this.flattenLocaleLangs(items) : items;
-    const pageList = publishLangs.map((lang) => ({ path: `${this.path.replace(found.location, lang.location)}` }));
+    const pageList = publishLangs.map((lang) => ({ path: this.getPage(lang).newFullPath }));
+    await publishPages(pageList);
+    this._message = undefined;
+  }
+
+  async handlePublish(item) {
+    this._message = { text: 'Publishing banner' };
+    const pageList = [{ path: item.newFullPath }];
     await publishPages(pageList);
     this._message = undefined;
   }
@@ -99,6 +99,7 @@ class NxLocales extends LitElement {
           return html`
           <li>
             <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
+            <button @click=${() => this.handlePublish(page)}>Publish</button>
             ${!isCurrent ? html`<button @click=${() => this.handleOpen(page)}>Edit</button>` : ''}
           </li>`;
         })}
@@ -119,7 +120,7 @@ class NxLocales extends LitElement {
       <div class="lang-group">
         <div class="lang-group-header">
           <p>${title}</p>
-          <button @click=${() => this.handlePublish(items)}>Publish all</button>
+          <button @click=${() => this.handlePublishAll(items)}>Publish all</button>
         </div>
         <ul class="lang-group-list">${items.map((item) => html`
           <li class="lang-top-list-item">

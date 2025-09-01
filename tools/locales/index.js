@@ -85,7 +85,6 @@ export async function publishPages(pages) {
         nextUrl.inProgress = true;
         queue.push(nextUrl);
       } else {
-        console.log('out');
         console.log(pages);
         const finished = pages.every((url) => url.status);
         if (finished) {
