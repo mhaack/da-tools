@@ -27,14 +27,14 @@ export async function getLangsAndLocales() {
   const { data: langData } = sheet.languages;
   const { data: localeData } = sheet.locales;
 
-  const langs = langData.map((row) => ({ name: row.name, location: row.location }));
+  const langs = langData.map((row) => ({ name: row.name, location: row.location, site: row.site }));
 
   const locales = localeData.map((row) => {
     const localeLangs = langs.map((lang) => ({
       name: lang.name,
       site: row.site,
       globalLocation: lang.location,
-      location: row.site ? `${row.site}${lang.location}` : `${lang.location}-${row.location.replace('/', '')}`,
+      location: row.location ? `${lang.location}-${row.location.replace('/', '')}` : lang.location,
     }));
     return {
       ...row,

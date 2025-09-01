@@ -60,8 +60,8 @@ class NxLocales extends LitElement {
     const copyFromLocation = found.globalLocation || found.location;
     const copyFromPath = this.path.replace(found.location, copyFromLocation);
     const newPath = this.path.replace(found.location, lang.location);
-    //const newFullPath = `/${this.org}/${this.site}${newPath}`;
-    const newFullPath = lang.site ? `/${this.org}${newPath}` : `/${this.org}/${this.site}${newPath}`;
+    const newSite = lang.site || this.site;
+    const newFullPath = `/${this.org}/${newSite}${newPath}`;
     const exists = await getPage(newFullPath);
     if (!exists) await copyPage(`/${this.org}/${this.site}${copyFromPath}`, newFullPath);
     this.actions.setHash(newFullPath);
