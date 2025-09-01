@@ -10,6 +10,10 @@ button {
   background-color: var(--s2-blue-400);
 }
 
+li.current {
+  color: red
+}
+
 .message {
   position: fixed;
   inset: 0;

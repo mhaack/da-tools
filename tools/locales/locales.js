@@ -53,7 +53,14 @@ class NxLocales extends LitElement {
     return found;
   }
 
-  async handleOpen(lang) {
+
+  async handleOpen(page) {
+    const exists = await getPage(page.newFullPath);
+    if (!exists) await copyPage(page.currentPath, page.newFullPath);
+    this.actions.setHref(`https://da.live/edit#${page.newFullPath}`);
+  }
+
+  getUrl(lang) {
     const found = this.findCurrentLang();
     if (!found) return;
 
@@ -62,10 +69,15 @@ class NxLocales extends LitElement {
     const newPath = this.path.replace(found.location, lang.location);
     const newSite = lang.site || `/${this.site}`;
     const newFullPath = `/${this.org}${newSite}${newPath}`;
-    const exists = await getPage(newFullPath);
-    if (!exists) await copyPage(`/${this.org}/${this.site}${copyFromPath}`, newFullPath);
-    this.actions.setHref(`https://da.live/edit#${newFullPath}`);
+
+
+    return { currentPath: copyFromPath, newFullPath };  
+    // const exists = await getPage(newFullPath);
+    // if (!exists) await copyPage(`/${this.org}/${this.site}${copyFromPath}`, newFullPath);
+    // this.actions.setHref(`https://da.live/edit#${newFullPath}`);
   }
+
+
 
   async handlePublish(items) {
     this._message = { text: 'Publishing banner' };
@@ -79,12 +91,14 @@ class NxLocales extends LitElement {
   renderLocaleLangs(langs) {
     return html`<div class="locale-lang-list-container">
       <ul class="locale-lang-group-list">
-        ${langs.map((lang) => html`
-          <li>
+        ${langs.map((lang) => {
+          const url = this.getUrl(lang);
+          return html`
+          <li class="${url.currentPath == this.path ? 'current' : ''}">
             <p>${lang.name}</p>
-            <button @click=${() => this.handleOpen(lang)}>Edit</button>
-          </li>
-        `)}
+            <button @click=${() => this.handleOpen(url)}>Edit</button>
+          </li>`;
+        })}
       </ul>
     </div>`;
   }
