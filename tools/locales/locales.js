@@ -95,10 +95,11 @@ class NxLocales extends LitElement {
       <ul class="locale-lang-group-list">
         ${langs.map((lang) => {
           const page = this.getPage(lang);
+          const isCurrent = page.newPath === this.path && this.site === lang.site.substring(1);
           return html`
           <li>
-            <p class="${page.newPath === this.path && this.site === lang.site.substring(1) ? 'current' : ''}">${lang.name}</p>
-            <button @click=${() => this.handleOpen(page)}>Edit</button>
+            <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
+            ${!isCurrent ? html`<button @click=${() => this.handleOpen(page)}>Edit</button>` : ''}
           </li>`;
         })}
       </ul>
@@ -107,9 +108,10 @@ class NxLocales extends LitElement {
 
   renderGroupLang(name,lang) {
     const page = this.getPage(lang);
+    const isCurrent = page.newPath === this.path && this.site === lang.site.substring(1);
     return html`
-    <p class="${page.newPath === this.path && this.site === lang.site.substring(1) ? 'current' : ''}">${name}</p>
-    <div class="lang-button"><button @click=${() => this.handleOpen(page)}>Edit</button></div>`;
+    <p class="${isCurrent ? 'current' : ''}">${name}</p>
+    ${!isCurrent ? html`<div class="lang-button"><button @click=${() => this.handleOpen(page)}>Edit</button></div>` : ''}`;
   }
 
   renderGroup(title, items) {
