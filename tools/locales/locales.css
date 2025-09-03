@@ -8,6 +8,7 @@ button {
   border-radius: 6px;
   padding: 2px 8px;
   background-color: var(--s2-green-600);
+  min-width: 52px;
 }
 
 .publish-button {
