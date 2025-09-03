@@ -71,9 +71,8 @@ class NxLocales extends LitElement {
     const copyFromLocation = found.globalLocation || found.location;
     const copyFromPath = this.path.replace(found.location, copyFromLocation);
     const newPath = this.path.replace(found.location, lang.location);
-    const newSite = lang.site || `/${this.site}`;
-    const newFullPath = `/${this.org}${newSite}${newPath}`;
-    const newAEMFullPath = `/${this.org}${newSite}/main${newPath}`;
+    const newFullPath = `/${this.org}/${lang.site}${newPath}`;
+    const newAEMFullPath = `/${this.org}/${lang.site}/main${newPath}`;
 
     // eslint-disable-next-line consistent-return
     return {
@@ -81,6 +80,7 @@ class NxLocales extends LitElement {
       newFullPath,
       newPath,
       newAEMFullPath,
+      exists: lang.exists,
     };
   }
 
