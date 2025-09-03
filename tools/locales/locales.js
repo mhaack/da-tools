@@ -112,12 +112,12 @@ class NxLocales extends LitElement {
   }
 
   renderActionButtons(page, isCurrent) {
-    if (isCurrent) return '';
+    if (isCurrent || !page.exists) return '';
 
-    // Show loading state while page data is being fetched
-    if (page.exists === null) {
-      return html`<div class="loading-indicator">Loading...</div>`;
-    }
+    // // Show loading state while page data is being fetched
+    // if (page.exists === null) {
+    //   return html`<div class="loading-indicator">Loading...</div>`;
+    // }
 
     return html`
       ${page.exists ? html`<button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>` : ''}
