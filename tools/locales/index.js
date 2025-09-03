@@ -43,7 +43,7 @@ export async function getLangsAndLocales() {
   const { data: langData } = sheet.languages;
   const { data: localeData } = sheet.locales;
 
-  const langs = langData.map((row) => ({ name: row.name, location: row.location, site: row.site }));
+  const langs = langData.map((row) => ({ name: row.name, location: row.location, site: row.site ? row.site.replace(/^\//, '') : site }));
 
   const locales = await Promise.all(localeData.map(async (row) => {
     const localeLangs = await Promise.all(langs.map(async (lang) => {

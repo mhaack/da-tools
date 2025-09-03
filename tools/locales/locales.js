@@ -6,7 +6,6 @@ import getStyle from 'https://da.live/nx/public/utils/styles.js';
 import {
   setContext,
   getLangsAndLocales,
-  getPage,
   copyPage,
   publishPages,
 } from './index.js';
@@ -59,7 +58,7 @@ class NxLocales extends LitElement {
   }
 
   async handleCreate(page) {
-    await copyPage(page.currentPath, page.newFullPath);
+    await copyPage(`${this.org}/${page.currentPath}`, page.newFullPath);
     this.actions.setHref(`https://da.live/edit#${page.newFullPath}`);
   }
 
