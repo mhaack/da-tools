@@ -38,7 +38,7 @@ async function fetchStatus(org, site, aemPath) {
     const res = await fetch(statusUrl, opts);
     if (!res.ok) { throw new Error(res.status); }
     const data = await res.json();
-    return { preview: data.preview.status, live: data.live.status };
+    return { preview: data.preview, live: data.live };
   } catch {
     return null;
   }

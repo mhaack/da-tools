@@ -115,9 +115,10 @@ class NxLocales extends LitElement {
   }
 
   renderAEMStatus(page) {
-    if (!page.exists) return '';
+    if (!page.exists || !page.aemStatus?.live) return '';
+    const aemStatus = page.aemStatus?.live;
     return html`
-        <div class="icon icon-aem ${page.aemStatus?.live ? `status-${page.aemStatus.live}` : ''}"></div>      
+        <div title="${aemStatus.status === 200 ? aemStatus.lastModified : 'Not published'}" class="icon icon-aem ${aemStatus.status ? `status-${aemStatus.status}` : ''}"></div>      
     `;
   }
 
