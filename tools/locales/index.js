@@ -23,15 +23,15 @@ export const [setContext, getContext] = (() => {
   ];
 })();
 
-export async function getPage(fullpath) {
+export async function getPage(org, site, path) {
   const { token } = getContext();
   const opts = { headers: { Authorization: `Bearer ${token}` } };
-  const resp = await fetch(`${DA_ORIGIN}/source${fullpath}.html`, opts);
+  const resp = await fetch(`${DA_ORIGIN}/source/${org}/${site}${path}.html`, opts);
   return resp.status === 200;
 }
 
-async function fetchStatus(aemPath) {
-  const { org, site, token } = getContext();
+async function fetchStatus(org, site, aemPath) {
+  const { token } = getContext();
   const opts = { headers: { Authorization: `Bearer ${token}` } };
   const statusUrl = `${AEM_ORIGIN}/status/${org}/${site}/main${aemPath}`;
   try {
@@ -68,8 +68,8 @@ export async function getLangsAndLocales(path) {
         location: row.location ? `${lang.location}-${row.location.replace('/', '')}` : lang.location,
       };
       localeLang.pagePath = `${localeLang.location}/${path.split('/').slice(2).join('/')}`;
-      localeLang.exists = await getPage(`/${org}/${localeLang.site}${localeLang.pagePath}`);
-      localeLang.aemStatus = await fetchStatus(localeLang.pagePath);
+      localeLang.exists = await getPage(org, localeLang.site, localeLang.pagePath);
+      localeLang.aemStatus = await fetchStatus(org, localeLang.site, localeLang.pagePath);
       return localeLang;
     }));
 
