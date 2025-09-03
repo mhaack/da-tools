@@ -2,7 +2,7 @@ p {
   font-size: 16px;
 }
 
-.locale-lang-buttons button {
+button {
   font-family: inherit;
   border: none;
   border-radius: 6px;
@@ -10,11 +10,11 @@ p {
   background-color: var(--s2-green-600);
 }
 
-.locale-lang-buttons .publish-button {
+.publish-button {
   background-color: var(--s2-blue-400);
 }
 
-.locale-lang-buttons .create-button {
+.create-button {
   background-color: var(--s2-gray-400);
 }
 
@@ -22,22 +22,22 @@ p.current {
   color: var(--s2-red-800);
 }
 
-.locale-lang-buttons .icon {
+.locale-lang-aem-status .icon {
   height: 26px;
   width: 26px;
 }
 
-.locale-lang-buttons .icon-aem {
+.locale-lang-aem-status .icon-aem {
   border-radius: 5px;
   background-color: #959595;
   background-image: url('https://da.live/nx/img/logos/aec.svg');
 }
 
-.locale-lang-buttons .icon-aem.status-200 {
+.locale-lang-aem-status .icon-aem.status-200 {
   background-color: #fa0f00;
 }
 
-.locale-lang-buttons .icon-aem.status-404 {
+.locale-lang-aem-status .icon-aem.status-404 {
   cursor: default;
   background-color: #fa0f00;
   opacity: 0.25;

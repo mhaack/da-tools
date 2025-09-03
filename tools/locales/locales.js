@@ -110,8 +110,16 @@ class NxLocales extends LitElement {
       ${page.exists
     ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>`
     : html`<button class="create-button" @click=${() => this.handleCreate(page)}>Create</button>`}
-      ${page.exists ? html`<button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>
-    <div class="icon icon-aem ${page.aemStatus?.live ? `status-${page.aemStatus.live}` : ''}"></div>` : ''}
+      ${page.exists ? html`<button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>` : ''}
+    `;
+  }
+
+  renderAEMStatus(page) {
+    if (!page.exists) return '';
+    return html`
+      <div class="locale-lang-aem-status">
+        <div class="icon icon-aem ${page.aemStatus?.live ? `status-${page.aemStatus.live}` : ''}"></div>
+      </div>
     `;
   }
 
@@ -129,6 +137,7 @@ class NxLocales extends LitElement {
             <div class="locale-lang-buttons">
               ${this.renderActionButtons(page, isCurrent)}
             </div>
+            ${this.renderAEMStatus(page)}
           </li>`;
   })}
       </ul>
