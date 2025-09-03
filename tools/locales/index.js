@@ -49,17 +49,14 @@ export async function getLangsAndLocales() {
     const localeLangs = await Promise.all(langs.map(async (lang) => {
       const localeLang = {
         name: lang.name,
-        site: row.site || site,
+        site: row.site ? row.site.replace(/^\//, '') : site,
         globalLocation: lang.location,
         location: row.location ? `${lang.location}-${row.location.replace('/', '')}` : lang.location,
+        exists: await getPage(`/${org}/${this.site}${this.location}`),
       };
-      const exists = await getPage(`/${org}/${localeLang.site}${localeLang.location}`);
-      localeLang.exists = exists;
       return localeLang;
     }));
 
-    // const exists = await getPage(`/${org}/${localeLangs.site}${localeLangs.location}`);
-    // localeLangs.exists = exists;
     return {
       ...row,
       langs: localeLangs,
