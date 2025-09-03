@@ -52,8 +52,8 @@ export async function getLangsAndLocales() {
         site: row.site ? row.site.replace(/^\//, '') : site,
         globalLocation: lang.location,
         location: row.location ? `${lang.location}-${row.location.replace('/', '')}` : lang.location,
-        exists: await getPage(`/${org}/${this.site}${this.location}`),
       };
+      localeLang.exists = await getPage(`/${org}/${localeLang.site}${localeLang.location}`);
       return localeLang;
     }));
 
