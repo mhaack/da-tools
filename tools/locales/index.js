@@ -30,7 +30,7 @@ export async function getPage(fullpath) {
   return resp.status === 200;
 }
 
-export async function getLangsAndLocales() {
+export async function getLangsAndLocales(path) {
   const { org, site, token } = getContext();
   const opts = { headers: { Authorization: `Bearer ${token}` } };
 
@@ -53,7 +53,8 @@ export async function getLangsAndLocales() {
         globalLocation: lang.location,
         location: row.location ? `${lang.location}-${row.location.replace('/', '')}` : lang.location,
       };
-      localeLang.exists = await getPage(`/${org}/${localeLang.site}${localeLang.location}`);
+      localeLang.pagePath = `${localeLang.location}/${path.split('/').slice(2).join('/')}`;
+      localeLang.exists = await getPage(`/${org}/${localeLang.site}${localeLang.pagePath}`);
       return localeLang;
     }));
 

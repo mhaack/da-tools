@@ -28,7 +28,7 @@ class NxLocales extends LitElement {
   }
 
   async setup() {
-    const { message, langs, locales } = await getLangsAndLocales();
+    const { message, langs, locales } = await getLangsAndLocales(this.path);
     if (message) {
       this._message = message;
       return;
