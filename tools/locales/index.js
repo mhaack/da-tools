@@ -33,7 +33,7 @@ export async function getPage(fullpath) {
 async function fetchStatus(aemPath) {
   const { org, site, token } = getContext();
   const opts = { headers: { Authorization: `Bearer ${token}` } };
-  const statusUrl = `${AEM_ORIGIN}${org}/${site}/main/${aemPath}`;
+  const statusUrl = `${AEM_ORIGIN}/${org}/${site}/main${aemPath}`;
   try {
     const res = await fetch(statusUrl, opts);
     if (!res.ok) { throw new Error(res.status); }
