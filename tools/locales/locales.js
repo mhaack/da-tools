@@ -117,9 +117,7 @@ class NxLocales extends LitElement {
   renderAEMStatus(page) {
     if (!page.exists) return '';
     return html`
-      <div class="locale-lang-aem-status">
-        <div class="icon icon-aem ${page.aemStatus?.live ? `status-${page.aemStatus.live}` : ''}"></div>
-      </div>
+        <div class="icon icon-aem ${page.aemStatus?.live ? `status-${page.aemStatus.live}` : ''}"></div>      
     `;
   }
 
@@ -137,7 +135,9 @@ class NxLocales extends LitElement {
             <div class="locale-lang-buttons">
               ${this.renderActionButtons(page, isCurrent)}
             </div>
-            ${this.renderAEMStatus(page)}
+            <div class="locale-lang-aem-status">
+              ${this.renderAEMStatus(page)}
+            </div>
           </li>`;
   })}
       </ul>

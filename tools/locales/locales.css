@@ -26,6 +26,10 @@ p.current {
   margin-left: auto;
 }
 
+.locale-lang-aem-status {
+  min-width: 25px;
+}
+
 .locale-lang-aem-status .icon {
   height: 20px;
   width: 20px;
