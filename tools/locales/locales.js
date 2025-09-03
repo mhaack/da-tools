@@ -58,9 +58,12 @@ class NxLocales extends LitElement {
     return found;
   }
 
+  async handleCreate(page) {
+    await copyPage(page.currentPath, page.newFullPath);
+    this.actions.setHref(`https://da.live/edit#${page.newFullPath}`);
+  }
+
   async handleOpen(page) {
-    //const exists = await getPage(page.newFullPath);
-    //if (!exists) await copyPage(page.currentPath, page.newFullPath);
     this.actions.setHref(`https://da.live/edit#${page.newFullPath}`);
   }
 
@@ -113,8 +116,8 @@ class NxLocales extends LitElement {
           <li>
             <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
             <div class="locale-lang-buttons">
-              ${!isCurrent && !page.exists ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>` : ''}
-              ${!isCurrent && page.exists ? html`<button class="publish-button" @click=${() => this.handleCreate(page)}>Create</button>` : ''}
+              ${!isCurrent && page.exists ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>` : ''}
+              ${!isCurrent && !page.exists ? html`<button class="create-button" @click=${() => this.handleCreate(page)}>Create</button>` : ''}
               <button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>
             </div>
           </li>`;
