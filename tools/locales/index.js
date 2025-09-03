@@ -66,11 +66,9 @@ export async function getLangsAndLocales(path) {
         site: row.site ? row.site.replace(/^\//, '') : site,
         globalLocation: lang.location,
         location: row.location ? `${lang.location}-${row.location.replace('/', '')}` : lang.location,
+        status: false,
       };
       localeLang.pagePath = `${localeLang.location}/${path.split('/').slice(2).join('/')}`;
-      // Initialize with placeholder values - will be populated later
-      localeLang.exists = null;
-      localeLang.aemStatus = null;
       return localeLang;
     });
 
@@ -95,6 +93,7 @@ export async function populatePageData(locales) {
 
       return {
         ...localeLang,
+        status: true,
         exists,
         aemStatus,
       };
