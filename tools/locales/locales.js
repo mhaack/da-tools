@@ -6,6 +6,7 @@ import getStyle from 'https://da.live/nx/public/utils/styles.js';
 import {
   setContext,
   getLangsAndLocales,
+  populatePageData,
   copyPage,
   publishPages,
 } from './index.js';
@@ -19,6 +20,7 @@ class NxLocales extends LitElement {
     _langs: { state: true },
     _locales: { state: true },
     _message: { state: true },
+    _loading: { state: true },
   };
 
   connectedCallback() {
@@ -35,6 +37,11 @@ class NxLocales extends LitElement {
     }
     this._langs = langs;
     this._locales = locales;
+
+    // Load page data asynchronously after initial render
+    this._loading = true;
+    this._locales = await populatePageData(locales);
+    this._loading = false;
   }
 
   findInLang(langs) {
@@ -78,11 +85,11 @@ class NxLocales extends LitElement {
 
     // eslint-disable-next-line consistent-return
     return {
+      ...lang,
       currentPath: copyFromPath,
       newFullPath,
       newPath,
       newAEMFullPath,
-      exists: lang.exists,
     };
   }
 
@@ -104,12 +111,21 @@ class NxLocales extends LitElement {
   }
 
   renderActionButtons(page, isCurrent) {
-    if (isCurrent) return '';
+    if (isCurrent || !page.status) return '';
+
     return html`
-      ${page.exists
-    ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>`
-    : html`<button class="create-button" @click=${() => this.handleCreate(page)}>Create</button>`}
       ${page.exists ? html`<button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>` : ''}
+      ${page.exists ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>`
+    : html`<button class="create-button" @click=${() => this.handleCreate(page)}>Create</button>`}
+    `;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  renderAEMStatus(page) {
+    if (!page.status || !page.exists || !page.aemStatus?.live) return '';
+    const aemStatus = page.aemStatus.live;
+    return html`
+        <div title="${aemStatus.status === 200 ? aemStatus.lastModified : 'Not published'}" class="icon icon-aem ${aemStatus.status ? `status-${aemStatus.status}` : ''}"></div>
     `;
   }
 
@@ -126,6 +142,9 @@ class NxLocales extends LitElement {
             <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
             <div class="locale-lang-buttons">
               ${this.renderActionButtons(page, isCurrent)}
+            </div>
+            <div class="locale-lang-aem-status">
+              ${this.renderAEMStatus(page)}
             </div>
           </li>`;
   })}

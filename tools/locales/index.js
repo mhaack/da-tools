@@ -23,11 +23,25 @@ export const [setContext, getContext] = (() => {
   ];
 })();
 
-export async function getPage(fullpath) {
+export async function fetchDAPage(org, site, path) {
   const { token } = getContext();
   const opts = { headers: { Authorization: `Bearer ${token}` } };
-  const resp = await fetch(`${DA_ORIGIN}/source${fullpath}.html`, opts);
+  const resp = await fetch(`${DA_ORIGIN}/source/${org}/${site}${path}.html`, opts);
   return resp.status === 200;
+}
+
+async function fetchAEMStatus(org, site, aemPath) {
+  const { token } = getContext();
+  const opts = { headers: { Authorization: `Bearer ${token}` } };
+  const statusUrl = `${AEM_ORIGIN}/status/${org}/${site}/main${aemPath}`;
+  try {
+    const res = await fetch(statusUrl, opts);
+    if (!res.ok) { throw new Error(res.status); }
+    const data = await res.json();
+    return { preview: data.preview, live: data.live };
+  } catch {
+    return null;
+  }
 }
 
 export async function getLangsAndLocales(path) {
@@ -45,17 +59,44 @@ export async function getLangsAndLocales(path) {
 
   const langs = langData.map((row) => ({ name: row.name, location: row.location, site: row.site ? row.site.replace(/^\//, '') : site }));
 
-  const locales = await Promise.all(localeData.map(async (row) => {
-    const localeLangs = await Promise.all(langs.map(async (lang) => {
+  const locales = localeData.map((row) => {
+    const localeLangs = langs.map((lang) => {
       const localeLang = {
         name: lang.name,
         site: row.site ? row.site.replace(/^\//, '') : site,
         globalLocation: lang.location,
         location: row.location ? `${lang.location}-${row.location.replace('/', '')}` : lang.location,
+        status: false,
       };
       localeLang.pagePath = `${localeLang.location}/${path.split('/').slice(2).join('/')}`;
-      localeLang.exists = await getPage(`/${org}/${localeLang.site}${localeLang.pagePath}`);
       return localeLang;
+    });
+
+    return {
+      ...row,
+      langs: localeLangs,
+    };
+  });
+
+  return { langs, locales };
+}
+
+export async function populatePageData(locales) {
+  const { org } = getContext();
+
+  const updatedLocales = await Promise.all(locales.map(async (row) => {
+    const localeLangs = await Promise.all(row.langs.map(async (localeLang) => {
+      const exists = await fetchDAPage(org, localeLang.site, localeLang.pagePath);
+      const aemStatus = exists
+        ? await fetchAEMStatus(org, localeLang.site, localeLang.pagePath)
+        : null;
+
+      return {
+        ...localeLang,
+        status: true,
+        exists,
+        aemStatus,
+      };
     }));
 
     return {
@@ -64,7 +105,7 @@ export async function getLangsAndLocales(path) {
     };
   }));
 
-  return { langs, locales };
+  return updatedLocales;
 }
 
 export async function copyPage(sourcePath, destPath) {
