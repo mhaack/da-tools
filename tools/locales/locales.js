@@ -103,6 +103,16 @@ class NxLocales extends LitElement {
     this._message = undefined;
   }
 
+  renderActionButtons(page, isCurrent) {
+    if (isCurrent) return '';
+    return html`
+      ${page.exists
+    ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>`
+    : html`<button class="create-button" @click=${() => this.handleCreate(page)}>Create</button>`}
+      ${page.exists ? html`<button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>` : ''}
+    `;
+  }
+
   renderLocaleLangs(name, langs) {
     return html`
     <p>${name}</p>
@@ -115,9 +125,7 @@ class NxLocales extends LitElement {
           <li>
             <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
             <div class="locale-lang-buttons">
-              ${!isCurrent && page.exists ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>` : ''}
-              ${!isCurrent && !page.exists ? html`<button class="create-button" @click=${() => this.handleCreate(page)}>Create</button>` : ''}
-              <button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>
+              ${this.renderActionButtons(page, isCurrent)}
             </div>
           </li>`;
   })}
