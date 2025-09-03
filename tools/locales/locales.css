@@ -44,10 +44,12 @@ p.current {
 }
 
 .locale-lang-aem-status .icon-aem.status-200 {
-  background-color: var(--spectrum-blue-800);
+  background-color: #fa0f00;
 }
 
 .locale-lang-aem-status .icon-aem.status-404 {
+  cursor: default;
+  background-color: #fa0f00;
   opacity: 0.25;
 }
 
