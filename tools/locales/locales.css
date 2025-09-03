@@ -39,17 +39,15 @@ p.current {
 
 .locale-lang-aem-status .icon-aem {
   border-radius: 5px;
-  background-color: #959595;
-  background-image: url('https://da.live/nx/img/logos/aec.svg');
+  background-color: var(--s2-gray-500);
+  background-image: url('/tools/locales/icons/aec.svg');
 }
 
 .locale-lang-aem-status .icon-aem.status-200 {
-  background-color: #fa0f00;
+  background-color: var(--s2-red-800);
 }
 
 .locale-lang-aem-status .icon-aem.status-404 {
-  cursor: default;
-  background-color: #fa0f00;
   opacity: 0.25;
 }
 
