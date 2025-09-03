@@ -44,7 +44,7 @@ p.current {
 }
 
 .locale-lang-aem-status .icon-aem.status-200 {
-  background-color: var(--s2-red-900);
+  background-color: var(--s2-red-800);
 }
 
 .locale-lang-aem-status .icon-aem.status-404 {
