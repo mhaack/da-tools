@@ -30,6 +30,20 @@ export async function getPage(fullpath) {
   return resp.status === 200;
 }
 
+async function fetchStatus(aemPath) {
+  const { org, site, token } = getContext();
+  const opts = { headers: { Authorization: `Bearer ${token}` } };
+  const statusUrl = `${AEM_ORIGIN}${org}/${site}/main/${aemPath}`;
+  try {
+    const res = await fetch(statusUrl, opts);
+    if (!res.ok) { throw new Error(res.status); }
+    const data = await res.json();
+    return { preview: data.preview.status, live: data.live.status };
+  } catch {
+    return null;
+  }
+}
+
 export async function getLangsAndLocales(path) {
   const { org, site, token } = getContext();
   const opts = { headers: { Authorization: `Bearer ${token}` } };
@@ -55,6 +69,7 @@ export async function getLangsAndLocales(path) {
       };
       localeLang.pagePath = `${localeLang.location}/${path.split('/').slice(2).join('/')}`;
       localeLang.exists = await getPage(`/${org}/${localeLang.site}${localeLang.pagePath}`);
+      localeLang.aemStatus = await fetchStatus(localeLang.pagePath);
       return localeLang;
     }));
 
