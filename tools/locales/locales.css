@@ -22,6 +22,27 @@ p.current {
   color: var(--s2-red-800);
 }
 
+.locale-lang-buttons .icon {
+  height: 26px;
+  width: 26px;
+}
+
+.locale-lang-buttons .icon-aem {
+  border-radius: 5px;
+  background-color: #959595;
+  background-image: url('https://da.live/nx/img/logos/aec.svg');
+}
+
+.locale-lang-buttons .icon-aem.status-200 {
+  background-color: #fa0f00;
+}
+
+.locale-lang-buttons .icon-aem.status-404 {
+  cursor: default;
+  background-color: #fa0f00;
+  opacity: 0.25;
+}
+
 .message {
   position: fixed;
   inset: 0;
