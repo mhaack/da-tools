@@ -59,8 +59,8 @@ export async function getLangsAndLocales(path) {
 
   const langs = langData.map((row) => ({ name: row.name, location: row.location, site: row.site ? row.site.replace(/^\//, '') : site }));
 
-  const locales = await Promise.all(localeData.map(async (row) => {
-    const localeLangs = await Promise.all(langs.map(async (lang) => {
+  const locales = localeData.map((row) => {
+    const localeLangs = langs.map((lang) => {
       const localeLang = {
         name: lang.name,
         site: row.site ? row.site.replace(/^\//, '') : site,
@@ -68,9 +68,36 @@ export async function getLangsAndLocales(path) {
         location: row.location ? `${lang.location}-${row.location.replace('/', '')}` : lang.location,
       };
       localeLang.pagePath = `${localeLang.location}/${path.split('/').slice(2).join('/')}`;
-      localeLang.exists = await getPage(org, localeLang.site, localeLang.pagePath);
-      localeLang.aemStatus = await fetchStatus(org, localeLang.site, localeLang.pagePath);
+      // Initialize with placeholder values - will be populated later
+      localeLang.exists = null;
+      localeLang.aemStatus = null;
       return localeLang;
+    });
+
+    return {
+      ...row,
+      langs: localeLangs,
+    };
+  });
+
+  return { langs, locales };
+}
+
+export async function populatePageData(locales) {
+  const { org } = getContext();
+
+  const updatedLocales = await Promise.all(locales.map(async (row) => {
+    const localeLangs = await Promise.all(row.langs.map(async (localeLang) => {
+      const [exists, aemStatus] = await Promise.all([
+        getPage(org, localeLang.site, localeLang.pagePath),
+        fetchStatus(org, localeLang.site, localeLang.pagePath),
+      ]);
+
+      return {
+        ...localeLang,
+        exists,
+        aemStatus,
+      };
     }));
 
     return {
@@ -79,7 +106,7 @@ export async function getLangsAndLocales(path) {
     };
   }));
 
-  return { langs, locales };
+  return updatedLocales;
 }
 
 export async function copyPage(sourcePath, destPath) {

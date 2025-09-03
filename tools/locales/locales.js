@@ -6,6 +6,7 @@ import getStyle from 'https://da.live/nx/public/utils/styles.js';
 import {
   setContext,
   getLangsAndLocales,
+  populatePageData,
   copyPage,
   publishPages,
 } from './index.js';
@@ -19,6 +20,7 @@ class NxLocales extends LitElement {
     _langs: { state: true },
     _locales: { state: true },
     _message: { state: true },
+    _loading: { state: true },
   };
 
   connectedCallback() {
@@ -35,6 +37,11 @@ class NxLocales extends LitElement {
     }
     this._langs = langs;
     this._locales = locales;
+
+    // Load page data asynchronously after initial render
+    this._loading = true;
+    this._locales = await populatePageData(locales);
+    this._loading = false;
   }
 
   findInLang(langs) {
@@ -106,6 +113,12 @@ class NxLocales extends LitElement {
 
   renderActionButtons(page, isCurrent) {
     if (isCurrent) return '';
+
+    // Show loading state while page data is being fetched
+    if (page.exists === null) {
+      return html`<div class="loading-indicator">Loading...</div>`;
+    }
+
     return html`
       ${page.exists ? html`<button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>` : ''}
       ${page.exists ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>`
@@ -113,11 +126,13 @@ class NxLocales extends LitElement {
     `;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   renderAEMStatus(page) {
-    if (!page.exists || !page.aemStatus?.live) return '';
-    const aemStatus = page.aemStatus?.live;
+    // Show nothing while loading or if page doesn't exist
+    if (page.exists === null || !page.exists || !page.aemStatus?.live) return '';
+    const aemStatus = page.aemStatus.live;
     return html`
-        <div title="${aemStatus.status === 200 ? aemStatus.lastModified : 'Not published'}" class="icon icon-aem ${aemStatus.status ? `status-${aemStatus.status}` : ''}"></div>      
+        <div title="${aemStatus.status === 200 ? aemStatus.lastModified : 'Not published'}" class="icon icon-aem ${aemStatus.status ? `status-${aemStatus.status}` : ''}"></div>
     `;
   }
 
