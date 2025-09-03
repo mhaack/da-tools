@@ -85,12 +85,11 @@ class NxLocales extends LitElement {
 
     // eslint-disable-next-line consistent-return
     return {
+      ...lang,
       currentPath: copyFromPath,
       newFullPath,
       newPath,
       newAEMFullPath,
-      exists: lang.exists,
-      aemStatus: lang.aemStatus,
     };
   }
 
@@ -129,7 +128,7 @@ class NxLocales extends LitElement {
   // eslint-disable-next-line class-methods-use-this
   renderAEMStatus(page) {
     // Show nothing while loading or if page doesn't exist
-    if (page.exists === null || !page.exists || !page.aemStatus?.live) return '';
+    if (page.exists === null || !page.status || !page.aemStatus?.live) return '';
     const aemStatus = page.aemStatus.live;
     return html`
         <div title="${aemStatus.status === 200 ? aemStatus.lastModified : 'Not published'}" class="icon icon-aem ${aemStatus.status ? `status-${aemStatus.status}` : ''}"></div>
