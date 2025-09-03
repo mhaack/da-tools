@@ -23,14 +23,14 @@ export const [setContext, getContext] = (() => {
   ];
 })();
 
-export async function getPage(org, site, path) {
+export async function fetchDAPage(org, site, path) {
   const { token } = getContext();
   const opts = { headers: { Authorization: `Bearer ${token}` } };
   const resp = await fetch(`${DA_ORIGIN}/source/${org}/${site}${path}.html`, opts);
   return resp.status === 200;
 }
 
-async function fetchStatus(org, site, aemPath) {
+async function fetchAEMStatus(org, site, aemPath) {
   const { token } = getContext();
   const opts = { headers: { Authorization: `Bearer ${token}` } };
   const statusUrl = `${AEM_ORIGIN}/status/${org}/${site}/main${aemPath}`;
@@ -86,10 +86,10 @@ export async function populatePageData(locales) {
 
   const updatedLocales = await Promise.all(locales.map(async (row) => {
     const localeLangs = await Promise.all(row.langs.map(async (localeLang) => {
-      const [exists, aemStatus] = await Promise.all([
-        getPage(org, localeLang.site, localeLang.pagePath),
-        fetchStatus(org, localeLang.site, localeLang.pagePath),
-      ]);
+      const exists = await fetchDAPage(org, localeLang.site, localeLang.pagePath);
+      const aemStatus = exists
+        ? await fetchAEMStatus(org, localeLang.site, localeLang.pagePath)
+        : null;
 
       return {
         ...localeLang,
