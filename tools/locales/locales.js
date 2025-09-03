@@ -6,7 +6,6 @@ import getStyle from 'https://da.live/nx/public/utils/styles.js';
 import {
   setContext,
   getLangsAndLocales,
-  getPage,
   copyPage,
   publishPages,
 } from './index.js';
@@ -29,7 +28,7 @@ class NxLocales extends LitElement {
   }
 
   async setup() {
-    const { message, langs, locales } = await getLangsAndLocales();
+    const { message, langs, locales } = await getLangsAndLocales(this.path);
     if (message) {
       this._message = message;
       return;
@@ -58,9 +57,12 @@ class NxLocales extends LitElement {
     return found;
   }
 
+  async handleCreate(page) {
+    await copyPage(`/${this.org}/${this.site}${page.currentPath}`, page.newFullPath);
+    this.actions.setHref(`https://da.live/edit#${page.newFullPath}`);
+  }
+
   async handleOpen(page) {
-    const exists = await getPage(page.newFullPath);
-    if (!exists) await copyPage(page.currentPath, page.newFullPath);
     this.actions.setHref(`https://da.live/edit#${page.newFullPath}`);
   }
 
@@ -71,15 +73,16 @@ class NxLocales extends LitElement {
     const copyFromLocation = found.globalLocation || found.location;
     const copyFromPath = this.path.replace(found.location, copyFromLocation);
     const newPath = this.path.replace(found.location, lang.location);
-    const newSite = lang.site || `/${this.site}`;
-    const newFullPath = `/${this.org}${newSite}${newPath}`;
-    const newAEMFullPath = `/${this.org}${newSite}/main${newPath}`;
+    const newFullPath = `/${this.org}/${lang.site}${newPath}`;
+    const newAEMFullPath = `/${this.org}/${lang.site}/main${newPath}`;
+
     // eslint-disable-next-line consistent-return
     return {
       currentPath: copyFromPath,
       newFullPath,
       newPath,
       newAEMFullPath,
+      exists: lang.exists,
     };
   }
 
@@ -112,7 +115,8 @@ class NxLocales extends LitElement {
           <li>
             <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
             <div class="locale-lang-buttons">
-              ${!isCurrent ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>` : ''}
+              ${!isCurrent && page.exists ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>` : ''}
+              ${!isCurrent && !page.exists ? html`<button class="create-button" @click=${() => this.handleCreate(page)}>Create</button>` : ''}
               <button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>
             </div>
           </li>`;

@@ -23,7 +23,14 @@ export const [setContext, getContext] = (() => {
   ];
 })();
 
-export async function getLangsAndLocales() {
+export async function getPage(fullpath) {
+  const { token } = getContext();
+  const opts = { headers: { Authorization: `Bearer ${token}` } };
+  const resp = await fetch(`${DA_ORIGIN}/source${fullpath}.html`, opts);
+  return resp.status === 200;
+}
+
+export async function getLangsAndLocales(path) {
   const { org, site, token } = getContext();
   const opts = { headers: { Authorization: `Bearer ${token}` } };
 
@@ -36,29 +43,28 @@ export async function getLangsAndLocales() {
   const { data: langData } = sheet.languages;
   const { data: localeData } = sheet.locales;
 
-  const langs = langData.map((row) => ({ name: row.name, location: row.location, site: row.site }));
+  const langs = langData.map((row) => ({ name: row.name, location: row.location, site: row.site ? row.site.replace(/^\//, '') : site }));
 
-  const locales = localeData.map((row) => {
-    const localeLangs = langs.map((lang) => ({
-      name: lang.name,
-      site: row.site,
-      globalLocation: lang.location,
-      location: row.location ? `${lang.location}-${row.location.replace('/', '')}` : lang.location,
+  const locales = await Promise.all(localeData.map(async (row) => {
+    const localeLangs = await Promise.all(langs.map(async (lang) => {
+      const localeLang = {
+        name: lang.name,
+        site: row.site ? row.site.replace(/^\//, '') : site,
+        globalLocation: lang.location,
+        location: row.location ? `${lang.location}-${row.location.replace('/', '')}` : lang.location,
+      };
+      localeLang.pagePath = `${localeLang.location}/${path.split('/').slice(2).join('/')}`;
+      localeLang.exists = await getPage(`/${org}/${localeLang.site}${localeLang.pagePath}`);
+      return localeLang;
     }));
+
     return {
       ...row,
       langs: localeLangs,
     };
-  });
+  }));
 
   return { langs, locales };
-}
-
-export async function getPage(fullpath) {
-  const { token } = getContext();
-  const opts = { headers: { Authorization: `Bearer ${token}` } };
-  const resp = await fetch(`${DA_ORIGIN}/source${fullpath}.html`, opts);
-  return resp.status === 200;
 }
 
 export async function copyPage(sourcePath, destPath) {
