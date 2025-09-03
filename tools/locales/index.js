@@ -23,6 +23,13 @@ export const [setContext, getContext] = (() => {
   ];
 })();
 
+export async function getPage(fullpath) {
+  const { token } = getContext();
+  const opts = { headers: { Authorization: `Bearer ${token}` } };
+  const resp = await fetch(`${DA_ORIGIN}/source${fullpath}.html`, opts);
+  return resp.status === 200;
+}
+
 export async function getLangsAndLocales() {
   const { org, site, token } = getContext();
   const opts = { headers: { Authorization: `Bearer ${token}` } };
@@ -38,27 +45,23 @@ export async function getLangsAndLocales() {
 
   const langs = langData.map((row) => ({ name: row.name, location: row.location, site: row.site }));
 
-  const locales = localeData.map((row) => {
+  const locales = await Promise.all(localeData.map(async (row) => {
     const localeLangs = langs.map((lang) => ({
       name: lang.name,
-      site: row.site,
+      site: row.site || site,
       globalLocation: lang.location,
       location: row.location ? `${lang.location}-${row.location.replace('/', '')}` : lang.location,
     }));
+
+    const exists = await getPage(`/${org}/${localeLangs.site}${localeLangs.location}`);
+    localeLangs.exists = exists;
     return {
       ...row,
       langs: localeLangs,
     };
-  });
+  }));
 
   return { langs, locales };
-}
-
-export async function getPage(fullpath) {
-  const { token } = getContext();
-  const opts = { headers: { Authorization: `Bearer ${token}` } };
-  const resp = await fetch(`${DA_ORIGIN}/source${fullpath}.html`, opts);
-  return resp.status === 200;
 }
 
 export async function copyPage(sourcePath, destPath) {

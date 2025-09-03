@@ -74,6 +74,7 @@ class NxLocales extends LitElement {
     const newSite = lang.site || `/${this.site}`;
     const newFullPath = `/${this.org}${newSite}${newPath}`;
     const newAEMFullPath = `/${this.org}${newSite}/main${newPath}`;
+
     // eslint-disable-next-line consistent-return
     return {
       currentPath: copyFromPath,
@@ -112,7 +113,8 @@ class NxLocales extends LitElement {
           <li>
             <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
             <div class="locale-lang-buttons">
-              ${!isCurrent ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>` : ''}
+              ${!isCurrent && !page.exists ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>` : ''}
+              ${!isCurrent && page.exists ? html`<button class="publish-button" @click=${() => this.handleCreate(page)}>Create</button>` : ''}
               <button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>
             </div>
           </li>`;
