@@ -110,7 +110,7 @@ class NxLocales extends LitElement {
       <ul class="locale-lang-group-list">
         ${langs.map((lang) => {
     const page = this.getPage(lang);
-    const isCurrent = page.newPath === this.path && this.site === lang.site.substring(1);
+    const isCurrent = page.newPath === this.path && this.site === lang.site;
     return html`
           <li>
             <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
@@ -127,7 +127,7 @@ class NxLocales extends LitElement {
 
   renderGroupLang(name, lang) {
     const page = this.getPage(lang);
-    const isCurrent = page.newPath === this.path && this.site === lang.site.substring(1);
+    const isCurrent = page.newPath === this.path && this.site === lang.site;
     return html`
     <p class="${isCurrent ? 'current' : ''}">${name}</p>
     ${!isCurrent ? html`<div class="lang-button"><button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button></div>` : ''}`;
