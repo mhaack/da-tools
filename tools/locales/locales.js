@@ -110,9 +110,8 @@ class NxLocales extends LitElement {
       ${page.exists
     ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>`
     : html`<button class="create-button" @click=${() => this.handleCreate(page)}>Create</button>`}
-      ${page.exists ? html`<button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>` : ''}
-      <div class="icon icon-aem ${page.aemStatus?.preview ? `status-${page.aemStatus.preview}` : ''}"></div>
-      <div class="icon icon-aem ${page.aemStatus?.live ? `status-${page.aemStatus.live}` : ''}"></div>
+      ${page.exists ? html`<button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>
+    <div class="icon icon-aem ${page.aemStatus?.live ? `status-${page.aemStatus.live}` : ''}"></div>` : ''}
     `;
   }
 

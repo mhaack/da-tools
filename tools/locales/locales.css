@@ -2,7 +2,7 @@ p {
   font-size: 16px;
 }
 
-button {
+.locale-lang-buttons button {
   font-family: inherit;
   border: none;
   border-radius: 6px;
@@ -10,11 +10,11 @@ button {
   background-color: var(--s2-green-600);
 }
 
-.publish-button {
+.locale-lang-buttons .publish-button {
   background-color: var(--s2-blue-400);
 }
 
-.create-button {
+.locale-lang-buttons .create-button {
   background-color: var(--s2-gray-400);
 }
 
