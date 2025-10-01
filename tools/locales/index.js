@@ -117,6 +117,7 @@ export async function copyPage(sourcePath, destPath) {
 }
 
 export async function publishPages(pages) {
+  console.log('Publishing pages', pages);
   const { token } = getContext();
   const opts = { method: 'POST', headers: { Authorization: `Bearer ${token}` } };
 
@@ -126,6 +127,7 @@ export async function publishPages(pages) {
       resp = await fetch(`${AEM_ORIGIN}/live${url.path}`, opts);
     }
     url.status = resp.status;
+    url.resp = await resp.json();
   };
 
   const queue = new Queue(publish, 5);
@@ -137,7 +139,6 @@ export async function publishPages(pages) {
         nextUrl.inProgress = true;
         queue.push(nextUrl);
       } else {
-        console.log(pages);
         const finished = pages.every((url) => url.status);
         if (finished) {
           clearInterval(throttle);

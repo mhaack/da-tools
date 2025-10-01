@@ -93,21 +93,35 @@ class NxLocales extends LitElement {
     };
   }
 
+  _copyToClipboard(publishedUrls) {
+    const urls = publishedUrls.map((page) => page.resp.live.url);
+    this._message = { text: `${urls.length} page(s) published - Urls copied to clipboard` };
+    const blob = new Blob([urls.join('\n')], { type: 'text/plain' });
+    const data = [new ClipboardItem({ [blob.type]: blob })];
+    navigator.clipboard.write(data);
+  }
+
   async handlePublishAll(items) {
-    this._message = { text: 'Publishing banner' };
+    this._message = { text: 'Publishing ...' };
     const publishLangs = items[0].langs ? this.flattenLocaleLangs(items) : items;
-    const pageList = publishLangs.map((lang) => ({ path: this.getPage(lang).newAEMFullPath }));
+    const pageList = publishLangs
+      .filter((lang) => lang.aemStatus)
+      .map((lang) => ({ path: this.getPage(lang).newAEMFullPath }));
     const published = await publishPages(pageList);
-    console.log(published);
-    this._message = undefined;
+    if (published) {
+      this._copyToClipboard(published);
+    }
+    setTimeout(() => { this._message = undefined; }, 2000);
   }
 
   async handlePublish(item) {
-    this._message = { text: 'Publishing banner' };
+    this._message = { text: 'Publishing ...' };
     const pageList = [{ path: item.newAEMFullPath }];
     const published = await publishPages(pageList);
-    console.log(published);
-    this._message = undefined;
+    if (published) {
+      this._copyToClipboard(published);
+    }
+    setTimeout(() => { this._message = undefined; }, 1000);
   }
 
   renderActionButtons(page, isCurrent) {
