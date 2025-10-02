@@ -95,10 +95,14 @@ class NxLocales extends LitElement {
 
   _copyToClipboard(publishedUrls) {
     const urls = publishedUrls.map((page) => page.resp.live.url);
-    this._message = { text: `${urls.length} page(s) published - Urls copied to clipboard` };
-    const blob = new Blob([urls.join('\n')], { type: 'text/plain' });
-    const data = [new ClipboardItem({ [blob.type]: blob })];
-    navigator.clipboard.write(data);
+    if (urls && urls.length > 0) {
+      this._message = { text: `${urls.length} page(s) published - Urls copied to clipboard` };
+      const blob = new Blob([urls.join('\n')], { type: 'text/plain' });
+      const data = [new ClipboardItem({ [blob.type]: blob })];
+      navigator.clipboard.write(data);
+    } else {
+      this._message = { text: 'No pages published' };
+    }
   }
 
   async handlePublishAll(items) {
