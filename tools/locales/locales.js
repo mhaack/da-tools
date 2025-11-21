@@ -40,7 +40,7 @@ class NxLocales extends LitElement {
 
     // Load page data asynchronously after initial render
     this._loading = true;
-    const { langs: updatedLangs, locales: updatedLocales } = await populatePageData(langs, lo cales);
+    const { langs: updatedLangs, locales: updatedLocales } = await populatePageData(langs, locales);
     this._langs = updatedLangs;
     this._locales = updatedLocales;
     this._loading = false;
