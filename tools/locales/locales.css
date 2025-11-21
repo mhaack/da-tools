@@ -127,7 +127,7 @@ p.current {
     box-sizing: border-box;
   }
 
-  .aem-status {
+  > .aem-status {
     background: rgb(0 0 0 / 5%);
     padding-right: 4px;
   }
