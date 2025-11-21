@@ -142,13 +142,15 @@ class NxLocales extends LitElement {
     setTimeout(() => { this._message = undefined; }, 2500);
   }
 
-  renderActionButtons(page, isCurrent) {
-    if (isCurrent || !page.status) return '';
+  renderActionButtons(page) {
+    if (!page.status) return '';
+
+    const publishButton = page.exists ? html`<button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>` : '';
+    const editButton = page.exists ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>` : html`<button class="create-button" @click=${() => this.handleCreate(page)}>Create</button>`;
 
     return html`
-      ${page.exists ? html`<button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>` : ''}
-      ${page.exists ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>`
-    : html`<button class="create-button" @click=${() => this.handleCreate(page)}>Create</button>`}
+      ${publishButton}
+      ${editButton}
     `;
   }
 
@@ -174,7 +176,7 @@ class NxLocales extends LitElement {
     return html` <li>
             <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
             <div class="locale-lang-buttons">
-              ${this.renderActionButtons(page, isCurrent)}
+              ${this.renderActionButtons(page)}
             </div>
             <div class="aem-status">
               ${this.renderAEMStatus(page)}
@@ -189,10 +191,9 @@ class NxLocales extends LitElement {
     const page = this.getPage(lang);
     const isCurrent = page.newPath === this.path && this.site === lang.site;
     return html` <p class="${isCurrent ? 'current' : ''}">${name}</p>
-      ${!isCurrent
-    ? html`<div class="lang-button">
-        <button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>
-      </div>` : ''}
+      <div class="lang-button">
+        ${this.renderActionButtons(page)}
+      </div>
       <div class="aem-status">
         ${this.renderAEMStatus(page)}
       </div>`;
