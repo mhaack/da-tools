@@ -67,7 +67,7 @@ class NxLocales extends LitElement {
   async handleCreate(page) {
     await copyPage(
       `/${this.org}/${this.site}${page.currentPath}`,
-      page.newFullPath
+      page.newFullPath,
     );
     this.actions.setHref(`https://da.live/edit#${page.newFullPath}`);
   }
@@ -125,69 +125,39 @@ class NxLocales extends LitElement {
       .map((lang) => ({ path: this.getPage(lang).newAEMFullPath }));
     const published = await publishPages(pageList);
     if (published) {
-      await this._copyToClipboard(
-        published.map((page) => page.resp.live.url).join("\n")
-      );
+      await this._copyToClipboard(published);
     }
-    setTimeout(() => {
-      this._message = undefined;
-    }, 2500);
+    setTimeout(() => { this._message = undefined; }, 2500);
   }
 
   async handlePublish(item) {
-    this._message = { text: "Publishing ..." };
+    this._message = { text: 'Publishing ...' };
     const pageList = [{ path: item.newAEMFullPath }];
     const published = await publishPages(pageList);
     if (published) {
-      await this._copyToClipboard(
-        published.map((page) => page.resp.live.url).join("\n")
-      );
+      await this._copyToClipboard(published);
     }
-    setTimeout(() => {
-      this._message = undefined;
-    }, 2500);
+    setTimeout(() => { this._message = undefined; }, 2500);
   }
 
   renderActionButtons(page, isCurrent) {
-    if (isCurrent || !page.status) return "";
+    if (isCurrent || !page.status) return '';
 
     return html`
-      ${page.exists
-        ? html`<button
-            class="publish-button"
-            @click=${() => this.handlePublish(page)}
-          >
-            Publish
-          </button>`
-        : ""}
-      ${page.exists
-        ? html`<button
-            class="edit-button"
-            @click=${() => this.handleOpen(page)}
-          >
-            Edit
-          </button>`
-        : html`<button
-            class="create-button"
-            @click=${() => this.handleCreate(page)}
-          >
-            Create
-          </button>`}
+      ${page.exists ? html`<button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>` : ''}
+      ${page.exists ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>`
+    : html`<button class="create-button" @click=${() => this.handleCreate(page)}>Create</button>`}
     `;
   }
 
   // eslint-disable-next-line class-methods-use-this
   renderAEMStatus(page) {
-    if (!page.status || !page.exists || !page.aemStatus?.live) return "";
+    if (!page.status || !page.exists || !page.aemStatus?.live) return '';
     const aemStatus = page.aemStatus.live;
     return html`
       <div
-        title="${aemStatus.status === 200
-          ? aemStatus.lastModified
-          : "Not published"}"
-        class="icon icon-aem ${aemStatus.status
-          ? `status-${aemStatus.status}`
-          : ""}"
+        title="${aemStatus.status === 200 ? aemStatus.lastModified : 'Not published'}"
+        class="icon icon-aem ${aemStatus.status ? `status-${aemStatus.status}` : ''}"
       ></div>
     `;
   }
@@ -197,19 +167,18 @@ class NxLocales extends LitElement {
       <div class="locale-lang-list-container">
         <ul class="locale-lang-group-list">
           ${langs.map((lang) => {
-            const page = this.getPage(lang);
-            const isCurrent =
-              page.newPath === this.path && this.site === lang.site;
-            return html` <li>
-              <p class="${isCurrent ? "current" : ""}">${lang.name}</p>
-              <div class="locale-lang-buttons">
-                ${this.renderActionButtons(page, isCurrent)}
-              </div>
-              <div class="locale-lang-aem-status">
-                ${this.renderAEMStatus(page)}
-              </div>
-            </li>`;
-          })}
+    const page = this.getPage(lang);
+    const isCurrent = page.newPath === this.path && this.site === lang.site;
+    return html` <li>
+            <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
+            <div class="locale-lang-buttons">
+              ${this.renderActionButtons(page, isCurrent)}
+            </div>
+            <div class="locale-lang-aem-status">
+              ${this.renderAEMStatus(page)}
+            </div>
+          </li>`;
+  })}
         </ul>
       </div>`;
   }
@@ -217,14 +186,14 @@ class NxLocales extends LitElement {
   renderGroupLang(name, lang) {
     const page = this.getPage(lang);
     const isCurrent = page.newPath === this.path && this.site === lang.site;
-    return html` <p class="${isCurrent ? "current" : ""}">${name}</p>
+    return html` <p class="${isCurrent ? 'current' : ''}">${name}</p>
       ${!isCurrent
-        ? html`<div class="lang-button">
-            <button class="edit-button" @click=${() => this.handleOpen(page)}>
-              Edit
-            </button>
-          </div>`
-        : ""}`;
+    ? html`<div class="lang-button">
+        <button class="edit-button" @click=${() => this.handleOpen(page)}>
+          Edit
+        </button>
+      </div>`
+    : ''}`;
   }
 
   renderGroup(title, items) {
@@ -237,13 +206,13 @@ class NxLocales extends LitElement {
           </button>
         </div>
         <ul class="lang-group-list">
-          ${items.map(
-            (item) => html` <li class="lang-top-list-item">
-              ${item.langs
-                ? this.renderLocaleLangs(item.name, item.langs)
-                : this.renderGroupLang(item.name, item)}
-            </li>`
-          )}
+  ${items.map(
+    (item) => html` <li class="lang-top-list-item">
+      ${item.langs
+    ? this.renderLocaleLangs(item.name, item.langs)
+    : this.renderGroupLang(item.name, item)}
+    </li>`,
+  )}
         </ul>
       </div>
     `;
@@ -255,8 +224,8 @@ class NxLocales extends LitElement {
 
   renderAll() {
     return html`
-      ${this.renderGroup("Global languages", this._langs)}
-      ${this.renderGroup("Locales", this._locales)}
+      ${this.renderGroup('Global languages', this._langs)}
+      ${this.renderGroup('Locales', this._locales)}
       ${this._message && this.renderMessage()}
     `;
   }
