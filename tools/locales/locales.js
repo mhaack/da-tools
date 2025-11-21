@@ -40,7 +40,9 @@ class NxLocales extends LitElement {
 
     // Load page data asynchronously after initial render
     this._loading = true;
-    this._locales = await populatePageData(locales);
+    const { langs: updatedLangs, locales: updatedLocales } = await populatePageData(langs, lo cales);
+    this._langs = updatedLangs;
+    this._locales = updatedLocales;
     this._loading = false;
   }
 
@@ -174,7 +176,7 @@ class NxLocales extends LitElement {
             <div class="locale-lang-buttons">
               ${this.renderActionButtons(page, isCurrent)}
             </div>
-            <div class="locale-lang-aem-status">
+            <div class="aem-status">
               ${this.renderAEMStatus(page)}
             </div>
           </li>`;
@@ -189,11 +191,11 @@ class NxLocales extends LitElement {
     return html` <p class="${isCurrent ? 'current' : ''}">${name}</p>
       ${!isCurrent
     ? html`<div class="lang-button">
-        <button class="edit-button" @click=${() => this.handleOpen(page)}>
-          Edit
-        </button>
-      </div>`
-    : ''}`;
+        <button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>
+      </div>` : ''}
+      <div class="aem-status">
+        ${this.renderAEMStatus(page)}
+      </div>`;
   }
 
   renderGroup(title, items) {

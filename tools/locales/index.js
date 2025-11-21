@@ -57,7 +57,15 @@ export async function getLangsAndLocales(path) {
   const { data: langData } = sheet.languages;
   const { data: localeData } = sheet.locales;
 
-  const langs = langData.map((row) => ({ name: row.name, location: row.location, site: row.site ? row.site.replace(/^\//, '') : site }));
+  const pagePath = path.split('/').slice(2).join('/');
+
+  const langs = langData.map((row) => ({
+    name: row.name,
+    location: row.location,
+    site: row.site ? row.site.replace(/^\//, '') : site,
+    pagePath: `${row.location}/${pagePath}`,
+    status: false,
+  }));
 
   const locales = localeData.map((row) => {
     const localeLangs = langs.map((lang) => {
@@ -68,7 +76,7 @@ export async function getLangsAndLocales(path) {
         location: row.location ? `${lang.location}-${row.location.replace('/', '')}` : lang.location,
         status: false,
       };
-      localeLang.pagePath = `${localeLang.location}/${path.split('/').slice(2).join('/')}`;
+      localeLang.pagePath = `${localeLang.location}/${pagePath}`;
       return localeLang;
     });
 
@@ -81,8 +89,22 @@ export async function getLangsAndLocales(path) {
   return { langs, locales };
 }
 
-export async function populatePageData(locales) {
+export async function populatePageData(langs, locales) {
   const { org } = getContext();
+
+  const updatedLangs = await Promise.all(langs.map(async (lang) => {
+    const exists = await fetchDAPage(org, lang.site, lang.pagePath);
+    const aemStatus = exists
+      ? await fetchAEMStatus(org, lang.site, lang.pagePath)
+      : null;
+
+    return {
+      ...lang,
+      status: true,
+      exists,
+      aemStatus,
+    };
+  }));
 
   const updatedLocales = await Promise.all(locales.map(async (row) => {
     const localeLangs = await Promise.all(row.langs.map(async (localeLang) => {
@@ -105,7 +127,7 @@ export async function populatePageData(locales) {
     };
   }));
 
-  return updatedLocales;
+  return { langs: updatedLangs, locales: updatedLocales };
 }
 
 export async function copyPage(sourcePath, destPath) {
