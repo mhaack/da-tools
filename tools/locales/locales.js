@@ -65,7 +65,10 @@ class NxLocales extends LitElement {
   }
 
   async handleCreate(page) {
-    await copyPage(`/${this.org}/${this.site}${page.currentPath}`, page.newFullPath);
+    await copyPage(
+      `/${this.org}/${this.site}${page.currentPath}`,
+      page.newFullPath
+    );
     this.actions.setHref(`https://da.live/edit#${page.newFullPath}`);
   }
 
@@ -93,112 +96,135 @@ class NxLocales extends LitElement {
     };
   }
 
-  // _copyToClipboard(publishedUrls) {
-  //   const urls = publishedUrls.map((page) => page.resp.live.url);
-  //   if (urls && urls.length > 0) {
-  //     this._message = { text: `${urls.length} page(s) published - Urls copied to clipboard` };
-  //     const blob = new Blob([urls.join('\n')], { type: 'text/plain' });
-  //     const data = [new ClipboardItem({ [blob.type]: blob })];
-  //     navigator.clipboard.write(data);
-  //   } else {
-  //     this._message = { text: 'No pages published' };
-  //   }
-  // }
-
   async _copyToClipboard(publishedUrls) {
     const urls = publishedUrls.map((page) => page.resp.live.url);
     if (urls && urls.length > 0) {
       this._message = { text: `${urls.length} page(s) published - Urls copied to clipboard` };
-      const blob = new Blob([urls.join('\n')], { type: 'text/plain' });
-      const data = [new ClipboardItem({ [blob.type]: blob })];
+      const type = 'text/plain';
+      const clipboardItemData = { [type]: [urls.join('\n')] };
+      const clipboardItem = new ClipboardItem(clipboardItemData);
       try {
-        // Ensure this call happens directly as a result of user interaction
-        // and while the document is focused.
-        await navigator.clipboard.write(data); 
-        console.log('URLs successfully copied to clipboard.');
+        await navigator.clipboard.write([clipboardItem]);
       } catch (err) {
-        console.error('Failed to copy URLs to clipboard:', err);
-        // Optionally, inform the user that copying failed,
-        // or provide a fallback mechanism (e.g., display the URLs in a text area).
-        this._message = { text: 'Failed to copy URLs to clipboard. Please copy manually.' };
+        this._message = {
+          text: 'Failed to copy URLs to clipboard. Please copy manually.',
+        };
       }
     } else {
       this._message = { text: 'No pages published' };
     }
   }
 
-
   async handlePublishAll(items) {
     this._message = { text: 'Publishing ...' };
-    const publishLangs = items[0].langs ? this.flattenLocaleLangs(items) : items;
+    const publishLangs = items[0].langs
+      ? this.flattenLocaleLangs(items)
+      : items;
     const pageList = publishLangs
       .filter((lang) => lang.aemStatus)
       .map((lang) => ({ path: this.getPage(lang).newAEMFullPath }));
     const published = await publishPages(pageList);
     if (published) {
-      this._copyToClipboard(published);
+      await this._copyToClipboard(
+        published.map((page) => page.resp.live.url).join("\n")
+      );
     }
-    setTimeout(() => { this._message = undefined; }, 2000);
+    setTimeout(() => {
+      this._message = undefined;
+    }, 2500);
   }
 
   async handlePublish(item) {
-    this._message = { text: 'Publishing ...' };
+    this._message = { text: "Publishing ..." };
     const pageList = [{ path: item.newAEMFullPath }];
     const published = await publishPages(pageList);
     if (published) {
-      this._copyToClipboard(published);
+      await this._copyToClipboard(
+        published.map((page) => page.resp.live.url).join("\n")
+      );
     }
-    setTimeout(() => { this._message = undefined; }, 1000);
+    setTimeout(() => {
+      this._message = undefined;
+    }, 2500);
   }
 
   renderActionButtons(page, isCurrent) {
-    if (isCurrent || !page.status) return '';
+    if (isCurrent || !page.status) return "";
 
     return html`
-      ${page.exists ? html`<button class="publish-button" @click=${() => this.handlePublish(page)}>Publish</button>` : ''}
-      ${page.exists ? html`<button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button>`
-    : html`<button class="create-button" @click=${() => this.handleCreate(page)}>Create</button>`}
+      ${page.exists
+        ? html`<button
+            class="publish-button"
+            @click=${() => this.handlePublish(page)}
+          >
+            Publish
+          </button>`
+        : ""}
+      ${page.exists
+        ? html`<button
+            class="edit-button"
+            @click=${() => this.handleOpen(page)}
+          >
+            Edit
+          </button>`
+        : html`<button
+            class="create-button"
+            @click=${() => this.handleCreate(page)}
+          >
+            Create
+          </button>`}
     `;
   }
 
   // eslint-disable-next-line class-methods-use-this
   renderAEMStatus(page) {
-    if (!page.status || !page.exists || !page.aemStatus?.live) return '';
+    if (!page.status || !page.exists || !page.aemStatus?.live) return "";
     const aemStatus = page.aemStatus.live;
     return html`
-        <div title="${aemStatus.status === 200 ? aemStatus.lastModified : 'Not published'}" class="icon icon-aem ${aemStatus.status ? `status-${aemStatus.status}` : ''}"></div>
+      <div
+        title="${aemStatus.status === 200
+          ? aemStatus.lastModified
+          : "Not published"}"
+        class="icon icon-aem ${aemStatus.status
+          ? `status-${aemStatus.status}`
+          : ""}"
+      ></div>
     `;
   }
 
   renderLocaleLangs(name, langs) {
-    return html`
-    <p>${name}</p>
-    <div class="locale-lang-list-container">
-      <ul class="locale-lang-group-list">
-        ${langs.map((lang) => {
-    const page = this.getPage(lang);
-    const isCurrent = page.newPath === this.path && this.site === lang.site;
-    return html`
-          <li>
-            <p class="${isCurrent ? 'current' : ''}">${lang.name}</p>
-            <div class="locale-lang-buttons">
-              ${this.renderActionButtons(page, isCurrent)}
-            </div>
-            <div class="locale-lang-aem-status">
-              ${this.renderAEMStatus(page)}
-            </div>
-          </li>`;
-  })}
-      </ul>
-    </div>`;
+    return html` <p>${name}</p>
+      <div class="locale-lang-list-container">
+        <ul class="locale-lang-group-list">
+          ${langs.map((lang) => {
+            const page = this.getPage(lang);
+            const isCurrent =
+              page.newPath === this.path && this.site === lang.site;
+            return html` <li>
+              <p class="${isCurrent ? "current" : ""}">${lang.name}</p>
+              <div class="locale-lang-buttons">
+                ${this.renderActionButtons(page, isCurrent)}
+              </div>
+              <div class="locale-lang-aem-status">
+                ${this.renderAEMStatus(page)}
+              </div>
+            </li>`;
+          })}
+        </ul>
+      </div>`;
   }
 
   renderGroupLang(name, lang) {
     const page = this.getPage(lang);
     const isCurrent = page.newPath === this.path && this.site === lang.site;
-    return html`
-    <p class="${isCurrent ? 'current' : ''}">${name}</p>
-    ${!isCurrent ? html`<div class="lang-button"><button class="edit-button" @click=${() => this.handleOpen(page)}>Edit</button></div>` : ''}`;
+    return html` <p class="${isCurrent ? "current" : ""}">${name}</p>
+      ${!isCurrent
+        ? html`<div class="lang-button">
+            <button class="edit-button" @click=${() => this.handleOpen(page)}>
+              Edit
+            </button>
+          </div>`
+        : ""}`;
   }
 
   renderGroup(title, items) {
@@ -206,12 +232,18 @@ class NxLocales extends LitElement {
       <div class="lang-group">
         <div class="lang-group-header">
           <p>${title}</p>
-          <button @click=${() => this.handlePublishAll(items)}>Publish all</button>
+          <button @click=${() => this.handlePublishAll(items)}>
+            Publish all
+          </button>
         </div>
-        <ul class="lang-group-list">${items.map((item) => html`
-          <li class="lang-top-list-item">
-            ${item.langs ? this.renderLocaleLangs(item.name, item.langs) : this.renderGroupLang(item.name, item)}
-          </li>`)}
+        <ul class="lang-group-list">
+          ${items.map(
+            (item) => html` <li class="lang-top-list-item">
+              ${item.langs
+                ? this.renderLocaleLangs(item.name, item.langs)
+                : this.renderGroupLang(item.name, item)}
+            </li>`
+          )}
         </ul>
       </div>
     `;
@@ -223,8 +255,8 @@ class NxLocales extends LitElement {
 
   renderAll() {
     return html`
-      ${this.renderGroup('Global languages', this._langs)}
-      ${this.renderGroup('Locales', this._locales)}
+      ${this.renderGroup("Global languages", this._langs)}
+      ${this.renderGroup("Locales", this._locales)}
       ${this._message && this.renderMessage()}
     `;
   }
