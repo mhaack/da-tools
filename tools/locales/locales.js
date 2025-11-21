@@ -93,17 +93,40 @@ class NxLocales extends LitElement {
     };
   }
 
-  _copyToClipboard(publishedUrls) {
+  // _copyToClipboard(publishedUrls) {
+  //   const urls = publishedUrls.map((page) => page.resp.live.url);
+  //   if (urls && urls.length > 0) {
+  //     this._message = { text: `${urls.length} page(s) published - Urls copied to clipboard` };
+  //     const blob = new Blob([urls.join('\n')], { type: 'text/plain' });
+  //     const data = [new ClipboardItem({ [blob.type]: blob })];
+  //     navigator.clipboard.write(data);
+  //   } else {
+  //     this._message = { text: 'No pages published' };
+  //   }
+  // }
+
+  async _copyToClipboard(publishedUrls) {
     const urls = publishedUrls.map((page) => page.resp.live.url);
     if (urls && urls.length > 0) {
       this._message = { text: `${urls.length} page(s) published - Urls copied to clipboard` };
       const blob = new Blob([urls.join('\n')], { type: 'text/plain' });
       const data = [new ClipboardItem({ [blob.type]: blob })];
-      navigator.clipboard.write(data);
+      try {
+        // Ensure this call happens directly as a result of user interaction
+        // and while the document is focused.
+        await navigator.clipboard.write(data); 
+        console.log('URLs successfully copied to clipboard.');
+      } catch (err) {
+        console.error('Failed to copy URLs to clipboard:', err);
+        // Optionally, inform the user that copying failed,
+        // or provide a fallback mechanism (e.g., display the URLs in a text area).
+        this._message = { text: 'Failed to copy URLs to clipboard. Please copy manually.' };
+      }
     } else {
       this._message = { text: 'No pages published' };
     }
   }
+
 
   async handlePublishAll(items) {
     this._message = { text: 'Publishing ...' };
